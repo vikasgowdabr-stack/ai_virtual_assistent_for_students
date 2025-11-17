@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microphone Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Microphone Test Tool</h1>
+        <p>Use this tool to test if your microphone is working properly with your browser.</p>
+        
+        <div class="test-section">
+            <h3>Step 1: Check Browser Support</h3>
+            <div id="browserSupport"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Step 2: Check HTTPS/Protocol</h3>
+            <div id="protocolCheck"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Step 3: Test Microphone Access</h3>
+            <button onclick="testMicrophone()" id="testBtn">Test Microphone</button>
+            <div id="microphoneTest"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Step 4: Troubleshooting</h3>
+            <div id="troubleshooting"></div>
+        </div>
+    </div>
+
+    <script>
+        // Check browser support
+        function checkBrowserSupport() {
+            const div = document.getElementById('browserSupport');
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                div.innerHTML = '<div class="status success">✅ Your browser supports microphone access</div>';
+                return true;
+            } else {
+                div.innerHTML = '<div class="status error">❌ Your browser does not support microphone access. Please use Chrome, Firefox, or Safari.</div>';
+                return false;
+            }
+        }
+        
+        // Check protocol
+        function checkProtocol() {
+            const div = document.getElementById('protocolCheck');
+            if (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+                div.innerHTML = '<div class="status success">✅ Protocol is secure (HTTPS or localhost)</div>';
+                return true;
+            } else {
+                div.innerHTML = '<div class="status error">❌ Microphone access requires HTTPS. Current protocol: ' + location.protocol + '</div>';
+                return false;
+            }
+        }
+        
+        // Test microphone
+        async function testMicrophone() {
+            const btn = document.getElementById('testBtn');
+            const div = document.getElementById('microphoneTest');
+            
+            btn.disabled = true;
+            btn.textContent = 'Testing...';
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    } 
+                });
+                
+                // Get audio tracks info
+                const audioTracks = stream.getAudioTracks();
+                const track = audioTracks[0];
+                
+                div.innerHTML = `
+                    <div class="status success">
+                        ✅ Microphone access granted!<br>
+                        Device: ${track.label || 'Unknown'}<br>
+                        Enabled: ${track.enabled}<br>
+                        Muted: ${track.muted}
+                    </div>
+                `;
+                
+                // Stop the stream
+                stream.getTracks().forEach(track => track.stop());
+                
+                showTroubleshooting('success');
+                
+            } catch (error) {
+                console.error('Microphone error:', error);
+                
+                let errorMessage = '❌ Failed to access microphone: ';
+                let troubleshooting = '';
+                
+                if (error.name === 'NotAllowedError') {
+                    errorMessage += 'Permission denied';
+                    troubleshooting = 'Click the microphone icon in your browser\'s address bar and select "Allow"';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage += 'No microphone found';
+                    troubleshooting = 'Connect a microphone to your device and refresh the page';
+                } else if (error.name === 'NotReadableError') {
+                    errorMessage += 'Microphone is in use by another application';
+                    troubleshooting = 'Close other applications that might be using the microphone';
+                } else if (error.name === 'OverconstrainedError') {
+                    errorMessage += 'Microphone does not meet requirements';
+                    troubleshooting = 'Try using a different microphone';
+                } else {
+                    errorMessage += error.message;
+                    troubleshooting = 'Check your microphone connection and browser permissions';
+                }
+                
+                div.innerHTML = `<div class="status error">${errorMessage}</div>`;
+                showTroubleshooting('error', troubleshooting);
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'Test Microphone';
+        }
+        
+        function showTroubleshooting(status, message = '') {
+            const div = document.getElementById('troubleshooting');
+            
+            if (status === 'success') {
+                div.innerHTML = `
+                    <div class="status success">
+                        🎉 Your microphone is working perfectly!<br>
+                        You should be able to use voice features in the AI Tutor application.
+                    </div>
+                `;
+            } else {
+                div.innerHTML = `
+                    <div class="status error">
+                        <strong>How to fix this:</strong><br>
+                        ${message}<br><br>
+                        <strong>Additional steps:</strong>
+                        <ul>
+                            <li>Refresh the page after allowing permissions</li>
+                            <li>Make sure no other apps are using the microphone</li>
+                            <li>Try a different browser if the issue persists</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkBrowserSupport();
+            checkProtocol();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Virtual Assistant for Students</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            height: 70vh;
+        }
+
+        .chat-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-content {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .chat-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input input:focus {
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-voice {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-voice:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .btn-voice.recording {
+            background: #ff0000;
+            animation: pulse 1.5s infinite;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary:disabled {
+            background: #adb5bd;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .topics-list {
+            list-style: none;
+        }
+
+        .topics-list li {
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #c62828;
+        }
+
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #2e7d32;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 AI Virtual Assistant</h1>
+            <p>Your intelligent learning companion powered by Gemini</p>
+        </div>
+
+        <div class="main-content">
+            <div class="chat-section">
+                <div class="chat-header">
+                    <h2>💬 Chat with Your AI Tutor</h2>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message assistant">
+                        <div class="message-content">
+                            Hello! I'm your AI learning assistant. I can help you with various subjects like biology, computer science, physics, and more. Ask me anything!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Thinking...</p>
+                </div>
+
+                <div class="chat-input">
+                    <div class="input-group">
+                        <input type="text" id="messageInput" placeholder="Ask me anything about your studies..." onkeypress="handleKeyPress(event)">
+                        <button class="btn btn-primary" onclick="sendMessage()">
+                            <span>📤</span> Send
+                        </button>
+                        <button class="btn btn-voice" id="voiceBtn" onclick="toggleVoiceRecording()">
+                            <span>🎤</span> Voice
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <h3>📊 Session Analytics</h3>
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-item">
+                            <div class="stat-number" id="totalInteractions">0</div>
+                            <div class="stat-label">Interactions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="sessionDuration">0m</div>
+                            <div class="stat-label">Duration</div>
+                        </div>
+                    </div>
+                </div>
+
+               
+
+                <div class="card">
+                    <h3>🎤 Microphone Setup</h3>
+                    <button class="btn btn-secondary" id="testMicrophoneBtn" onclick="testMicrophone()" style="width: 100%; margin-bottom: 10px;">
+                        Test Microphone
+                    </button>
+                    <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
+                        Having trouble with voice input? Click the test button above to check your microphone setup.
+                    </p>
+                    <details style="margin-top: 15px;">
+                        <summary style="cursor: pointer; color: #667eea; font-weight: bold;">🔧 Troubleshooting Guide</summary>
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+                            <p><strong>Common Issues:</strong></p>
+                            <ul style="margin-left: 20px; margin-top: 5px;">
+                                <li>Browser permissions denied</li>
+                                <li>Microphone not connected</li>
+                                <li>Microphone in use by another app</li>
+                                <li>Not using HTTPS (except localhost)</li>
+                            </ul>
+                            <p style="margin-top: 10px;"><strong>Solutions:</strong></p>
+                            <ul style="margin-left: 20px; margin-top: 5px;">
+                                <li>Click the microphone icon in your browser's address bar</li>
+                                <li>Select "Allow" for microphone access</li>
+                                <li>Refresh the page after allowing permissions</li>
+                                <li>Close other apps using the microphone</li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="card">
+                    <h3>📚 Topics Discussed</h3>
+                    <ul class="topics-list" id="topicsList">
+                        <li>Start a conversation to see topics</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isRecording = false;
+        let sessionId = 'session_' + Date.now();
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAnalytics();
+            
+            // Add helpful message about microphone setup
+            setTimeout(() => {
+                addMessage('💡 Tip: If you want to use voice input, make sure to allow microphone permissions when prompted. You can also test your microphone using the button in the sidebar.', 'assistant');
+            }, 2000);
+        });
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function handleSearchKeyPress(event) {
+            if (event.key === 'Enter') {
+                searchKnowledge();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Show loading
+            showLoading(true);
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: sessionId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    addErrorMessage(data.error);
+                } else {
+                    addMessage(data.response, 'assistant');
+                    updateAnalytics();
+                }
+            } catch (error) {
+                addErrorMessage('Failed to send message. Please try again.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Add microphone permission check function
+        async function checkMicrophonePermissions() {
+            try {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    return { supported: false, message: 'Browser does not support microphone access' };
+                }
+                
+                // Check if we're on HTTPS
+                if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+                    return { supported: false, message: 'HTTPS required for microphone access' };
+                }
+                
+                // Try to get microphone permission
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(track => track.stop()); // Stop the test stream
+                
+                return { supported: true, message: 'Microphone access granted' };
+            } catch (error) {
+                return { supported: false, message: error.message, error: error };
+            }
+        }
+
+        // Add microphone test function
+        async function testMicrophone() {
+            const testBtn = document.getElementById('testMicrophoneBtn');
+            if (testBtn) {
+                testBtn.disabled = true;
+                testBtn.textContent = 'Testing...';
+            }
+            
+            const result = await checkMicrophonePermissions();
+            
+            if (result.supported) {
+                addMessage('✅ Microphone test successful! Your microphone is working properly.', 'assistant');
+            } else {
+                addErrorMessage('❌ Microphone test failed: ' + result.message);
+                
+                // Provide specific guidance based on the error
+                if (result.error && result.error.name === 'NotAllowedError') {
+                    addMessage('💡 To fix this: Click the microphone icon in your browser\'s address bar and select "Allow"', 'assistant');
+                } else if (result.error && result.error.name === 'NotFoundError') {
+                    addMessage('💡 To fix this: Connect a microphone to your device and refresh the page', 'assistant');
+                }
+            }
+            
+            if (testBtn) {
+                testBtn.disabled = false;
+                testBtn.textContent = 'Test Microphone';
+            }
+        }
+
+        let mediaRecorder;
+        let audioChunks = [];
+        
+        async function toggleVoiceRecording() {
+            const voiceBtn = document.getElementById('voiceBtn');
+            
+            if (!isRecording) {
+                // Start recording
+                try {
+                    // Check if we're on HTTPS (required for microphone access)
+                    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+                        addErrorMessage('Microphone access requires HTTPS. Please use https:// or localhost.');
+                        return;
+                    }
+                    
+                    // Check if getUserMedia is supported
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        addErrorMessage('Your browser does not support microphone access. Please use a modern browser like Chrome, Firefox, or Safari.');
+                        return;
+                    }
+                    
+                    // Request microphone permission with better error handling
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        } 
+                    });
+                    
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = (event) => {
+                        audioChunks.push(event.data);
+                    };
+                    
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const reader = new FileReader();
+                        
+                        reader.onload = async () => {
+                            try {
+                                const response = await fetch('/api/voice/stop', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        audio_data: reader.result,
+                                        session_id: sessionId
+                                    })
+                                });
+                                
+                                const data = await response.json();
+                                
+                                if (data.error) {
+                                    addErrorMessage(data.error);
+                                } else {
+                                    addMessage(data.transcription, 'user');
+                                    addMessage(data.response, 'assistant');
+                                    updateAnalytics();
+                                }
+                            } catch (error) {
+                                addErrorMessage('Failed to process voice input. Please try again.');
+                            }
+                        };
+                        
+                        reader.readAsDataURL(audioBlob);
+                    };
+                    
+                    mediaRecorder.start();
+                    isRecording = true;
+                    voiceBtn.classList.add('recording');
+                    voiceBtn.innerHTML = '<span>⏹️</span> Stop';
+                    
+                } catch (error) {
+                    console.error('Microphone error:', error);
+                    
+                    // Provide specific error messages based on the error type
+                    if (error.name === 'NotAllowedError') {
+                        addErrorMessage('Microphone access denied. Please allow microphone permissions in your browser and try again.');
+                    } else if (error.name === 'NotFoundError') {
+                        addErrorMessage('No microphone found. Please connect a microphone and try again.');
+                    } else if (error.name === 'NotReadableError') {
+                        addErrorMessage('Microphone is already in use by another application. Please close other apps using the microphone.');
+                    } else if (error.name === 'OverconstrainedError') {
+                        addErrorMessage('Microphone does not meet the required specifications. Please try a different microphone.');
+                    } else if (error.name === 'TypeError') {
+                        addErrorMessage('Microphone access not supported. Please use a modern browser.');
+                    } else {
+                        addErrorMessage('Failed to access microphone. Please check permissions and try again. Error: ' + error.message);
+                    }
+                }
+            } else {
+                // Stop recording
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    mediaRecorder.stop();
+                    mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                }
+                
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+                voiceBtn.innerHTML = '<span>🎤</span> Voice';
+            }
+        }
+
+        async function searchKnowledge() {
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput.value.trim();
+            
+            if (!query) return;
+            
+            try {
+                const response = await fetch('/api/knowledge/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query
+                    })
+                });
+                
+                const data = await response.json();
+                displaySearchResults(data.results);
+            } catch (error) {
+                addErrorMessage('Failed to search knowledge base.');
+            }
+        }
+
+        async function updateAnalytics() {
+            try {
+                const response = await fetch(`/api/analytics?session_id=${sessionId}`);
+                const data = await response.json();
+                
+                document.getElementById('totalInteractions').textContent = data.total_interactions || 0;
+                document.getElementById('sessionDuration').textContent = Math.round(data.session_duration_minutes || 0) + 'm';
+                
+                // Update topics
+                const topicsList = document.getElementById('topicsList');
+                if (data.topics_discussed && data.topics_discussed.length > 0) {
+                    topicsList.innerHTML = data.topics_discussed.map(topic => 
+                        `<li>${topic}</li>`
+                    ).join('');
+                }
+            } catch (error) {
+                console.error('Failed to update analytics:', error);
+            }
+        }
+
+        function addMessage(content, sender) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const time = new Date().toLocaleTimeString();
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    ${content}
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addErrorMessage(message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            chatMessages.appendChild(errorDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            if (show) {
+                loading.classList.add('show');
+            } else {
+                loading.classList.remove('show');
+            }
+        }
+
+        function displaySearchResults(results) {
+            const searchResults = document.getElementById('searchResults');
+            
+            if (!results || results.length === 0) {
+                searchResults.innerHTML = '<p>No results found.</p>';
+                return;
+            }
+            
+            const resultsHtml = results.map(result => `
+                <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                    <strong>${result.item.entity}</strong>
+                    <p style="margin-top: 5px; font-size: 0.9rem;">${result.item.summary}</p>
+                </div>
+            `).join('');
+            
+            searchResults.innerHTML = resultsHtml;
+        }
+
+        function playAudioResponse(audioUrl) {
+            const audio = new Audio(audioUrl);
+            audio.play().catch(error => {
+                console.error('Failed to play audio:', error);
+            });
+        }
+    </script>
+</body>
+</html>

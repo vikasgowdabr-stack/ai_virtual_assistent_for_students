@@ -1,0 +1,159 @@
+
+[
+    {
+        "id": "BIO001",
+        "entity": "Photosynthesis",
+        "type": "Biological Process",
+        "aliases": ["light-harvesting"],
+        "summary": "The process used by plants, algae, and some bacteria to convert light energy into chemical energy.",
+        "description": "Photosynthesis occurs in chloroplasts and involves two main stages: the light-dependent reactions and the light-independent reactions (Calvin cycle). It consumes carbon dioxide and water, and produces glucose (for energy) and oxygen as a byproduct.",
+        "properties": {
+            "chemical_equation": "6CO2 + 6H2O + Light Energy → C6H12O6 + 6O2",
+            "key_components": ["Chlorophyll", "Chloroplasts", "ATP", "NADPH"]
+        },
+        "relationships": [
+            { "target_id": "BIO002", "relation_type": "produces", "description": "Produces glucose, which is used in cellular respiration." },
+            { "target_id": "BIO003", "relation_type": "occurs_in", "description": "The process takes place inside chloroplasts."}
+        ]
+    },
+    {
+        "id": "BIO002",
+        "entity": "Cellular Respiration",
+        "type": "Biological Process",
+        "aliases": ["Aerobic Respiration"],
+        "summary": "The metabolic process in which cells convert biochemical energy from nutrients into ATP.",
+        "description": "Cellular respiration is the set of metabolic reactions and processes that take place in the cells of organisms to convert chemical energy into adenosine triphosphate (ATP), and then release waste products. It is the opposite process of photosynthesis.",
+        "properties": {
+            "stages": ["Glycolysis", "Krebs Cycle", "Electron Transport Chain"],
+            "primary_location": "Mitochondria"
+        },
+        "relationships": [
+            { "target_id": "BIO001", "relation_type": "is_complementary_to", "description": "Uses the products of photosynthesis (glucose and oxygen)." },
+            { "target_id": "BIO004", "relation_type": "occurs_in", "description": "Mainly takes place in the mitochondria."}
+        ]
+    },
+    {
+        "id": "BIO003",
+        "entity": "Chloroplast",
+        "type": "Organelle",
+        "summary": "The cellular organelle where photosynthesis takes place.",
+        "description": "Chloroplasts are found in plant cells and eukaryotic algae. They contain chlorophyll, the pigment that captures light energy.",
+        "relationships": [
+            { "target_id": "BIO001", "relation_type": "is_site_of", "description": "Is the location for photosynthesis." }
+        ]
+    },
+    {
+        "id": "BIO004",
+        "entity": "Mitochondrion",
+        "type": "Organelle",
+        "aliases": ["Mitochondria"],
+        "summary": "Known as the 'powerhouse of the cell,' it generates most of the cell's supply of ATP.",
+        "description": "Mitochondria are organelles found in the cells of most eukaryotes. They are responsible for generating most of the cell's supply of adenosine triphosphate (ATP), used as a source of chemical energy.",
+        "relationships": [
+            { "target_id": "BIO002", "relation_type": "is_site_of", "description": "Is the primary location for cellular respiration." }
+        ]
+    },
+    {
+        "id": "CS001",
+        "entity": "Artificial Intelligence",
+        "type": "Field of Study",
+        "aliases": ["AI"],
+        "summary": "The theory and development of computer systems able to perform tasks that normally require human intelligence.",
+        "description": "AI encompasses various sub-fields, including machine learning, natural language processing (NLP), computer vision, and robotics. Its goal is to create systems that can perceive, reason, learn, and problem-solve.",
+        "properties": {
+            "key_figures": ["Alan Turing", "John McCarthy", "Geoffrey Hinton"],
+            "subfields": ["Machine Learning", "Natural Language Processing", "Robotics"]
+        },
+        "relationships": [
+            { "target_id": "CS002", "relation_type": "includes_subfield", "description": "Machine Learning is a major subfield of AI." },
+            { "target_id": "CS004", "relation_type": "pioneered_by", "description": "Alan Turing is considered a father of AI."}
+        ]
+    },
+    {
+        "id": "CS002",
+        "entity": "Machine Learning",
+        "type": "Subfield of AI",
+        "aliases": ["ML"],
+        "summary": "The study of computer algorithms that can improve automatically through experience and by the use of data.",
+        "description": "Machine learning algorithms build a model based on sample data, known as training data, in order to make predictions or decisions without being explicitly programmed to do so. It is a core part of modern AI.",
+        "properties": {
+            "types": ["Supervised Learning", "Unsupervised Learning", "Reinforcement Learning"],
+            "common_applications": ["Image Recognition", "Spam Filtering", "Recommender Systems"]
+        },
+        "relationships": [
+            { "target_id": "CS001", "relation_type": "is_a", "description": "Is a subfield of Artificial Intelligence." },
+            { "target_id": "CS003", "relation_type": "uses_architecture", "description": "Neural networks are a key architecture in machine learning."}
+        ]
+    },
+    {
+        "id": "CS003",
+        "entity": "Neural Network",
+        "type": "ML Model",
+        "aliases": ["Artificial Neural Network", "ANN"],
+        "summary": "A computing system inspired by the biological neural networks that constitute animal brains.",
+        "description": "An ANN is based on a collection of connected units or nodes called artificial neurons, which loosely model the neurons in a biological brain. Each connection, like the synapses in a biological brain, can transmit a signal to other neurons.",
+        "relationships": [
+            { "target_id": "CS002", "relation_type": "is_a_type_of", "description": "Is a fundamental model used in Machine Learning, especially for deep learning." }
+        ]
+    },
+    {
+        "id": "CS004",
+        "entity": "Alan Turing",
+        "type": "Person",
+        "summary": "A pioneering British mathematician and computer scientist, considered the father of theoretical computer science and artificial intelligence.",
+        "description": "Alan Turing was highly influential in the development of theoretical computer science, providing a formalisation of the concepts of algorithm and computation with the Turing machine. During World War II, he was instrumental in breaking German ciphers at Bletchley Park.",
+        "properties": {
+            "birth_date": "1912-06-23",
+            "death_date": "1954-06-07",
+            "major_contributions": ["Turing Machine", "Turing Test", "Codebreaking the Enigma"]
+        },
+        "relationships": [
+            { "target_id": "CS001", "relation_type": "contributed_to", "description": "His work laid the theoretical foundations for AI." },
+            { "target_id": "HIST001", "relation_type": "participated_in", "description": "His work was crucial to the Allied victory in World War II." }
+        ]
+    },
+    {
+        "id": "HIST001",
+        "entity": "World War II",
+        "type": "Historical Event",
+        "aliases": ["WWII"],
+        "summary": "A global war that lasted from 1939 to 1945, involving the vast majority of the world's countries.",
+        "description": "World War II was the deadliest conflict in human history, marked by 70 to 85 million fatalities. The principal belligerents were the Axis powers (Germany, Italy, and Japan) and the Allies (France, Great Britain, the United States, the Soviet Union, and China).",
+        "properties": {
+            "start_date": "1939-09-01",
+            "end_date": "1945-09-02",
+            "key_theaters": ["European Theatre", "Pacific Theatre"]
+        },
+        "relationships": [
+            { "target_id": "CS004", "relation_type": "was_influenced_by", "description": "Alan Turing's codebreaking efforts significantly impacted the war's outcome." }
+        ]
+    },
+    {
+        "id": "PHY001",
+        "entity": "General Relativity",
+        "type": "Scientific Theory",
+        "summary": "Albert Einstein's geometric theory of gravitation, which describes gravity as a curvature of spacetime.",
+        "description": "Published in 1915, general relativity extends special relativity and refines Newton's law of universal gravitation. It provides a unified description of gravity as a geometric property of space and time, or four-dimensional spacetime.",
+        "properties": {
+            "key_predictions": ["Gravitational Lensing", "Gravitational Waves", "Black Holes"]
+        },
+        "relationships": [
+            { "target_id": "PHY002", "relation_type": "developed_by", "description": "The theory was developed by Albert Einstein." }
+        ]
+    },
+    {
+        "id": "PHY002",
+        "entity": "Albert Einstein",
+        "type": "Person",
+        "summary": "A German-born theoretical physicist who developed the theory of relativity, one of the two pillars of modern physics.",
+        "description": "Einstein's work is also known for its influence on the philosophy of science. He is best known to the general public for his mass–energy equivalence formula E = mc², which has been dubbed 'the world's most famous equation'. He received the 1921 Nobel Prize in Physics for his discovery of the law of the photoelectric effect.",
+        "properties": {
+            "birth_date": "1879-03-14",
+            "death_date": "1955-04-18",
+            "major_contributions": ["General Relativity", "Special Relativity", "Photoelectric Effect"]
+        },
+        "relationships": [
+            { "target_id": "PHY001", "relation_type": "developed", "description": "He is the author of the theory of general relativity." }
+        ]
+    }
+]

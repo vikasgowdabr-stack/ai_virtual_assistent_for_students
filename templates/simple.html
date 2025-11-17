@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Virtual Assistant - Simple Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .chat-box { border: 1px solid #ccc; padding: 20px; height: 300px; overflow-y: auto; }
+        .input-area { margin-top: 20px; }
+        input[type="text"] { width: 70%; padding: 10px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; }
+    </style>
+</head>
+<body>
+    <h1>🎓 AI Virtual Assistant for Students</h1>
+    <p>Simple test interface - If you can see this, the web server is working!</p>
+    
+    <div class="chat-box" id="chatBox">
+        <p><strong>Assistant:</strong> Hello! I'm your AI learning assistant. Ask me anything!</p>
+    </div>
+    
+    <div class="input-area">
+        <input type="text" id="messageInput" placeholder="Type your question here..." onkeypress="if(event.key==='Enter') sendMessage()">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage('You: ' + message);
+            input.value = '';
+            
+            // Simulate response
+            setTimeout(() => {
+                addMessage('Assistant: I received your message: "' + message + '". The full AI features are working!');
+            }, 1000);
+        }
+        
+        function addMessage(text) {
+            const chatBox = document.getElementById('chatBox');
+            const p = document.createElement('p');
+            p.innerHTML = text;
+            chatBox.appendChild(p);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
